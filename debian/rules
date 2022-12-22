@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE=1
+export PYBUILD_NAME=pastescript
+export PYBUILD_DISABLE=test
+
+%:
+	dh $@ --with python3,sphinxdoc  --buildsystem=pybuild
+
+override_dh_auto_build:
+	dh_auto_build
+	PYTHONPATH=. http_proxy='http://127.0.0.1:9/' python3 -m sphinx -N -bhtml docs debian/html
+
+override_dh_auto_install:
+	dh_auto_install
+	mv debian/python3-pastescript/usr/bin/paster debian/python3-pastescript/usr/bin/paster3
+	dh_bash-completion
+
+override_dh_installchangelogs:
+	dh_installchangelogs docs/news.txt
